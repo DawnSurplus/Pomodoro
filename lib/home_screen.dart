@@ -10,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const int t5MinToSec = 60 * 5;
+  static const int t5MinToSec = 10;
   static const int maxCycle = 4;
 
   static const int t15MinToSec = 5;
@@ -31,25 +31,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool isRunning = false, isRestTime = false;
 
+  String timeState = "";
+
   late Timer timer;
 
   void onTick(Timer timer) {
-    if (isRunning) {
+    if (isRestTime) {
+      setState(() {
+        timeState = "Rest Time";
+      });
       if (totalSeconds == 0) {
         setState(() {
-          totalCycle++;
+          isRestTime = false;
           totalSeconds = selectedTime;
-
-          if (totalCycle > maxCycle) {
-            totalRound++;
-            totalCycle = 0;
-          }
+          totalCycle = 0;
         });
       } else {
         setState(() {
           totalSeconds -= 1;
         });
       }
+    } else if (isRunning) {
+      setState(() {
+        timeState = "Remain Time";
+
+        if (totalSeconds == 0) {
+          totalCycle++;
+          totalSeconds = selectedTime;
+
+          if (totalCycle >= maxCycle) {
+            totalRound++;
+            isRestTime = true;
+            totalSeconds = t5MinToSec;
+          }
+      } else {
+        totalSeconds -= 1;
+      }
+      });      
     } else {
       timer.cancel();
     }
@@ -60,9 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       isRunning = true;
-      if (totalCycle == 0) {
-        totalCycle++;
-      }
     });
   }
 
@@ -119,12 +134,24 @@ class _HomeScreenState extends State<HomeScreen> {
             flex: 3,
             child: Container(
               alignment: Alignment.bottomCenter,
-              child: Text(
-                format(totalSeconds),
-                style: TextStyle(
-                    color: Theme.of(context).cardColor,
-                    fontSize: 89,
-                    fontWeight: FontWeight.w600),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    timeState,
+                    style: TextStyle(
+                        color: Theme.of(context).cardColor,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    format(totalSeconds),
+                    style: TextStyle(
+                        color: Theme.of(context).cardColor,
+                        fontSize: 89,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
             ),
           ),
