@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,6 +11,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int totalSeconds = 1500;
+  bool isRunning = false;
 
   late Timer timer;
   void onTick(Timer timer) {
@@ -20,6 +22,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void onStartPressed() {
     timer = Timer.periodic(const Duration(seconds: 1), onTick);
+
+    setState(() {
+      isRunning = true;
+    });
+  }
+
+  void onPausePressed() {
+    timer.cancel();
+
+    setState(() {
+      isRunning = false;
+    });
   }
 
   @override
@@ -34,10 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text("$totalSeconds",
-                          style: TextStyle(
-                              color: Theme.of(context).cardColor,
-                              fontSize: 89,
-                              fontWeight: FontWeight.w600),
+                          style: TextStyle(color: Theme.of(context).cardColor,
+                                           fontSize: 89,
+                                           fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -45,8 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Flexible(
             flex: 3,
             child: Center(
-              child: IconButton(onPressed: onStartPressed,
-                                icon: const Icon(Icons.play_circle_outline),
+              child: IconButton(onPressed: isRunning ? onPausePressed : onStartPressed,
+                                icon: isRunning ? const Icon(Icons.pause_circle_outlined)
+                                                : const Icon(Icons.play_circle_outline),
                                 iconSize: 120,
                                 color: Theme.of(context).cardColor,
               ),
@@ -60,18 +74,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(15)),
+                                              borderRadius: BorderRadius.circular(15)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Pomodoros",
-                             style: TextStyle(fontSize: 20,
-                                              fontWeight: FontWeight.w600,
-                                              color: Theme.of(context).textTheme.displayLarge?.color),),
+                             style: TextStyle(color: Theme.of(context).textTheme.displayLarge?.color,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,),
+                        ),
                         Text("0",
-                        style: TextStyle(fontSize: 58,
-                                         fontWeight: FontWeight.w600,
-                                         color: Theme.of(context).textTheme.displayLarge?.color),),
+                             style: TextStyle(color: Theme.of(context).textTheme.displayLarge?.color,
+                                              fontSize: 58,
+                                              fontWeight: FontWeight.w600,),
+                        ),
                       ],
                     ),
                   ),
