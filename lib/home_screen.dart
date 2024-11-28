@@ -64,10 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
             isRestTime = true;
             totalSeconds = t5MinToSec;
           }
-      } else {
-        totalSeconds -= 1;
-      }
-      });      
+        } else {
+          totalSeconds -= 1;
+        }
+      });
     } else {
       timer.cancel();
     }
@@ -122,6 +122,19 @@ class _HomeScreenState extends State<HomeScreen> {
     setTime(t35MinToSec);
   }
 
+  void resetTimer() {
+    setState(() {
+      isRunning = false;
+      isRestTime = false;
+
+      totalCycle = 0;
+      totalRound = 0;
+      totalSeconds = selectedTime;
+
+      timeState = "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Time
           Flexible(
-            flex: 3,
+            flex: 4,
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Column(
@@ -246,9 +259,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          Flexible(
+            flex: 1,
+            child: TextButton(
+                onPressed: resetTimer,
+                child: Text(
+                  "Reset",
+                  style: TextStyle(
+                      color: Theme.of(context).cardColor, fontSize: 20),
+                )),
+          ),
           // Count
           Flexible(
-            flex: 2,
+            flex: 3,
             child: Row(
               children: [
                 Expanded(
