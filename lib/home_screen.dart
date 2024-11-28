@@ -10,32 +10,48 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const int T_15_MIN_TO_SEC = 60 * 15;
-  static const int T_15_MIN = 15;
-  static const int T_20_MIN_TO_SEC = 60 * 20;
-  static const int T_20_MIN = 20;
-  static const int T_25_MIN_TO_SEC = 60 * 25;
-  static const int T_25_MIN = 25;
-  static const int T_30_MIN_TO_SEC = 60 * 30;
-  static const int T_30_MIN = 30;
-  static const int T_35_MIN_TO_SEC = 60 * 35;
-  static const int T_35_MIN = 35;
+  static const int t5MinToSec = 60 * 5;
+  static const int maxCycle = 4;
 
-  int totalSeconds = T_25_MIN_TO_SEC, totalPomodoros = 0;
-  bool isRunning = false;
+  static const int t15MinToSec = 5;
+  static const int t15Min = 15;
+  static const int t20MinToSec = 60 * 20;
+  static const int t20Min = 20;
+  static const int t25MinToSec = 60 * 25;
+  static const int t25Min = 25;
+  static const int t30MinToSec = 60 * 30;
+  static const int t30Min = 30;
+  static const int t35MinToSec = 60 * 35;
+  static const int t35Min = 35;
+
+  int totalSeconds = t25MinToSec,
+      totalCycle = 0,
+      totalRound = 0,
+      selectedTime = t25MinToSec;
+
+  bool isRunning = false, isRestTime = false;
 
   late Timer timer;
+
   void onTick(Timer timer) {
-    if (totalSeconds == 0) {
-      setState(() {
-        totalPomodoros++;
-        isRunning = false;
-        totalSeconds = T_25_MIN_TO_SEC;
-      });
+    if (isRunning) {
+      if (totalSeconds == 0) {
+        setState(() {
+          totalCycle++;
+          totalSeconds = selectedTime;
+
+          if (totalCycle > maxCycle) {
+            totalRound++;
+            totalCycle = 0;
+          }
+        });
+      } else {
+        setState(() {
+          totalSeconds -= 1;
+        });
+      }
     } else {
-      setState(() {
-        totalSeconds -= 1;
-      });
+      timer.cancel();
     }
   }
 
@@ -44,6 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       isRunning = true;
+      if (totalCycle == 0) {
+        totalCycle++;
+      }
     });
   }
 
@@ -64,23 +83,28 @@ class _HomeScreenState extends State<HomeScreen> {
   void setTime(int seconds) {
     setState(() {
       totalSeconds = seconds;
+      selectedTime = seconds;
     });
   }
 
   void setTime15min() {
-    setTime(T_15_MIN_TO_SEC);
+    setTime(t15MinToSec);
   }
+
   void setTime20min() {
-    setTime(T_20_MIN_TO_SEC);
+    setTime(t20MinToSec);
   }
+
   void setTime25min() {
-    setTime(T_25_MIN_TO_SEC);
+    setTime(t25MinToSec);
   }
+
   void setTime30min() {
-    setTime(T_30_MIN_TO_SEC);
+    setTime(t30MinToSec);
   }
+
   void setTime35min() {
-    setTime(T_35_MIN_TO_SEC);
+    setTime(t35MinToSec);
   }
 
   @override
@@ -88,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,        
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Time
           Flexible(
@@ -109,49 +133,74 @@ class _HomeScreenState extends State<HomeScreen> {
             flex: 3,
             child: SingleChildScrollView(
               //scrollDirection: Axis.horizontal,
-              child: Row(              
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,                
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  OutlinedButton (
+                  OutlinedButton(
                       onPressed: setTime15min,
-                      style: OutlinedButton.styleFrom(backgroundColor: Theme.of(context).cardColor,
-                                                      side: const BorderSide(color: Colors.transparent)),
-                      child: Text("$T_15_MIN",
-                                  style: TextStyle(color: Theme.of(context).textTheme.displayLarge?.color,                                
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15),)),
-                  OutlinedButton (
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: Theme.of(context).cardColor,
+                          side: const BorderSide(color: Colors.transparent)),
+                      child: Text(
+                        "$t15Min",
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15),
+                      )),
+                  OutlinedButton(
                       onPressed: setTime20min,
-                      style: OutlinedButton.styleFrom(backgroundColor: Theme.of(context).cardColor,
-                                                      side: const BorderSide(color: Colors.transparent)),
-                      child: Text("$T_20_MIN",
-                                  style: TextStyle(color: Theme.of(context).textTheme.displayLarge?.color,                                
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15),)),
-                  OutlinedButton (
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: Theme.of(context).cardColor,
+                          side: const BorderSide(color: Colors.transparent)),
+                      child: Text(
+                        "$t20Min",
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15),
+                      )),
+                  OutlinedButton(
                       onPressed: setTime25min,
-                      style: OutlinedButton.styleFrom(backgroundColor: Theme.of(context).cardColor,
-                                                      side: const BorderSide(color: Colors.transparent)),
-                      child: Text("$T_25_MIN",
-                                  style: TextStyle(color: Theme.of(context).textTheme.displayLarge?.color,                                
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15),)),
-                  OutlinedButton (
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: Theme.of(context).cardColor,
+                          side: const BorderSide(color: Colors.transparent)),
+                      child: Text(
+                        "$t25Min",
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15),
+                      )),
+                  OutlinedButton(
                       onPressed: setTime30min,
-                      style: OutlinedButton.styleFrom(backgroundColor: Theme.of(context).cardColor,
-                                                      side: const BorderSide(color: Colors.transparent)),
-                      child: Text("$T_30_MIN",
-                                  style: TextStyle(color: Theme.of(context).textTheme.displayLarge?.color,                                
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15),)),
-                  OutlinedButton (
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: Theme.of(context).cardColor,
+                          side: const BorderSide(color: Colors.transparent)),
+                      child: Text(
+                        "$t30Min",
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15),
+                      )),
+                  OutlinedButton(
                       onPressed: setTime35min,
-                      style: OutlinedButton.styleFrom(backgroundColor: Theme.of(context).cardColor,
-                                                      side: const BorderSide(color: Colors.transparent)),
-                      child: Text("$T_35_MIN",
-                                  style: TextStyle(color: Theme.of(context).textTheme.displayLarge?.color,                                
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15),)),
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: Theme.of(context).cardColor,
+                          side: const BorderSide(color: Colors.transparent)),
+                      child: Text(
+                        "$t35Min",
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15),
+                      )),
                 ],
               ),
             ),
@@ -180,26 +229,62 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(15)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(
-                          "Pomodoros",
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).textTheme.displayLarge?.color,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Cycle",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.color,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              "$totalCycle/$maxCycle",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.color,
+                                fontSize: 58,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "0",
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).textTheme.displayLarge?.color,
-                            fontSize: 58,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Round",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.color,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              "$totalRound",
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.color,
+                                fontSize: 58,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
